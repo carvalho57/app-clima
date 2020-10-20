@@ -1,39 +1,57 @@
 (function (doc) {
-    const uri = "weather";
+    const uri = 'weather';
+    const storageCities = 'cities'
+    const emptyString = '';
 
     function getCityByName() {
-        let cityname = doc.querySelector('[data-js="cityname"]').value.trim();
+        let input = doc.querySelector('[data-js="cityname"]')
+        let cityname = input.value.trim();
+        input.value = emptyString;
+
+        if (isNullOrEmpty(cityname))
+            return null;
+
         let url = `${uri}/city/${cityname}`;
-        getCityUrl(url);
+        getCity(url);
+        setSearch(cityname);
     }
-    function setSearch(cityName) {                
-        var cities = JSON.parse(localStorage.getItem('cities'));
+
+    function setSearch(cityName) {
+        const MaxStoredCities = 5;
+        var cities = JSON.parse(localStorage.getItem(storageCities));
         cities.push(cityName);
-        if(cities.length > 5)
+
+        if (cities.length > MaxStoredCities)
             cities.shift(0);
-        localStorage.setItem('cities', JSON.stringify(cities));
+
+        localStorage.setItem(storageCities, JSON.stringify(cities));
     }
-    
+
     function getLastestSearch() {
-        var cities = JSON.parse(localStorage.setItem('cities'));
-        return cities;
+        return JSON.parse(localStorage.getItem(storageCities));
     }
 
-    function getCityByCoord() {
+    function getCityByCoord(longitude, latitude) {
         let coords = {
-            lon: -49.276855,
-            lat: -25.441105
+            lon: longitude,
+            lat: latitude
         };
+
         let url = `${uri}/coord?lon=${coords.lon}&lat=${coords.lat}`;
-        getCityUrl(url);
+        getCity(url);
     }
 
-    function getCityUrl(url) {
+    function isNullOrEmpty(input) {
+        return input == emptyString || input == undefined;
+    }
+
+    function getCity(url) {
         fetch(url)
-        .then(response => response.json())
-        .then(data => _displayInfo(data))
-        .then(data => setSearch(data))
-        .catch(error => console.error('Unable to get items.', error));
+            .then(response => response.json())
+            .then(data => {
+                _displayInfo(data)
+            })
+            .catch(error => console.error('Unable to get items.', error));
     }
 
     function _displayInfo(data) {
@@ -56,13 +74,34 @@
         while (elem.hasChildNodes())
             elem.removeChild(elem.lastChild)
     }
-
-    function init() {
+    function initEventListeners() {
         let search_city_name = doc.querySelector('[data-js="get-city-name"]');
         search_city_name.addEventListener('click', getCityByName, false);
-
-        if(!localStorage.getItem('cities'))
-            localStorage.setItem('cities', JSON.stringify([]));
+        search_city_name.addEventListener('keypress', (keypressed) => {
+            if (keypressed == 13)
+                getCityByName
+        }, false);
     }
+
+    function EnsureCreatedLocalStorage() {
+        if (!localStorage.getItem(storageCities))
+            localStorage.setItem(storageCities, JSON.stringify([]));
+    } 
+
+    function init() {
+        initEventListeners();
+        EnsureCreatedLocalStorage();        
+
+        navigator.geolocation
+            .getCurrentPosition(
+                (position) => getCityByCoord(position.coords.longitude, position.coords.latitude)
+            );
+
+        getLastestSearch()
+            .forEach(function (city) {
+                console.log(city);
+            });
+    }
+    
     init();
 })(document);
