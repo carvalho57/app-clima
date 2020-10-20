@@ -10,3 +10,14 @@ A aplicação funciona assim: o usuário digita a cidade, pegamos o campo, limpa
 - [X] Armazenar informações das cidades que ja foram pesquisadas 
 - [ ] Mostrar ultimas cidades na tela
 - [ ] Melhorar a aparencia
+
+#### Como Rodar
+
+Crie uma conta no https://openweathermap.org/api e pegue sua API KEY    
+Va no arquivo Settings.cs e modifique APIKEY 
+
+Na raiz do projeto, rode
+```
+    dotnet restore
+    dotnet run
+```
