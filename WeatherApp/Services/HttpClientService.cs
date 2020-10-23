@@ -4,8 +4,6 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using WeatherApp.Interfaces;
-using WeatherApp.Models;
 
 namespace WeatherApp.Services
 {

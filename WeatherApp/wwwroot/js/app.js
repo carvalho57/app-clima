@@ -51,7 +51,7 @@
             .then(data => {
                 _displayInfo(data)
             })
-            .catch(error => console.error('Unable to get items.', error));
+            .catch(error => console.error('Não foi possível recuperar as informacoes da cidade.', error));
     }
 
     function _displayInfo(data) {
